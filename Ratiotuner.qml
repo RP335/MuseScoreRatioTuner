@@ -122,6 +122,7 @@ MuseScore {
 
     function apply_to_nextnote(note)
     {
+        var prvc = prevcents
         var ratio1 = (rationumerator/ratiodenominator)
         console.log("ratio=" +ratio1)
 
@@ -129,27 +130,34 @@ MuseScore {
         var abscents = Math.abs (inicents)
         console.log("abscents=" +abscents)
         var underhun = (abscents%100).toFixed(2)
+        var fin = 0
         console.log("underhun="+underhun)
-        if (dir = 1)
+        if (dir ===  1)
         {
-            if (underhun<=50)
-                note.tuning = underhun+prevcents
+            if (underhun<=50){
+                console.log("underhun="+underhun)
+                fin = underhun + prvc
+
+                note.tuning = fin
+            }
             else
-                note.tuning = -(100-underhun)+prevcents
+                note.tuning = -(100-underhun)+ prvc
 
         }
         else
         {
             if (underhun<=50)
-                note.tuning = prevcents - underhun
+                note.tuning = prvc - underhun
             else
-                note.tuning = prevcents + (100-underhun)
+                note.tuning = prvc + (100-underhun)
         }
 
     }
     function ratio_to_cents()
     {
         console.log("I've reached here")
+        
+        prevcents = parseFloat(previouscents.text)
 
         applyToNotesInSelection(apply_to_nextnote)
         Qt.quit()
