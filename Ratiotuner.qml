@@ -14,8 +14,8 @@ MuseScore {
     description: "Description goes here"
     version: "1.0"
     pluginType: "dialog"
-    width: 500
-    height: 200
+    width: 700
+    height: 400
     property var offsetTextWidth: 40;
     property var offsetLabelAlignment: 0x02 | 0x80;
     property var history: 0;
@@ -23,6 +23,7 @@ MuseScore {
     property var ratiodenominator: 0
     property var cents: 0
     property var prevcents
+    property var dir: 1
 
     // set true if customisations are made to the tuning
     property var modified: false
@@ -34,12 +35,19 @@ MuseScore {
             Qt.quit()
         }
     }
+    function get_previous_tuning()
+    {
+        prevcents = parseFloat(previouscents.text)
+        console.log("pc="+prevcents)
+    }
     function parsenumer()
     {
         rationumerator = parseFloat(rationum.text)
+        console.log("rn="+rationumerator)
+
 
     }
-    function applyToNotesInSelection(func1,func2) {
+    function applyToNotesInSelection(func2) {
         if (typeof curScore === 'undefined')
             return;
 
@@ -55,7 +63,7 @@ MuseScore {
                   startStaff = 0; // start with 1st staff
                   endStaff = curScore.nstaves; // and end with last
             }
-       console.log(startStaff + " - " + endStaff + " - " + endTick)
+            console.log(startStaff + " - " + endStaff + " - " + endTick)
             for (var staff = startStaff; staff <= endStaff; staff++) {
                   for (var voice = 0; voice < 4; voice++) {
                         cursor.rewind(1); // sets voice to 0
@@ -68,12 +76,28 @@ MuseScore {
                         while (cursor.segment && (fullScore || cursor.tick < endTick)) {
                               if (cursor.element && cursor.element.type == Element.CHORD) {
                                     var notes = cursor.element.notes;
+
+                                    /*for (var i = 0; i< notes.length;i++)
+                                    {
+                                        for (var j =i+1;j<notes.length;j++)
+                                        {
+
+                                                if (notes[i].pitch>notes[j].pitch)
+                                                {
+                                                    var temp = notes[i];
+                                                    notes[i]= arr[j];
+                                                    notes[j] = temp;
+                                                }
+                                        }
+                                    }*/
+                                    console.log("I've reached here 2")
+
                                     for (var i = 0; i < notes.length; i++) {
                                           var note = notes[i];
-                                          if (i=0)
-                                            func1(note);
+                                          if (i===0)
+                                            func2(note);
                                         else
-                                            func2(note)
+                                            Qt.quit()
 
                                     }
                               }
@@ -85,11 +109,12 @@ MuseScore {
     function parsedenom()
     {
         ratiodenominator = parseFloat(ratiodenom.text)
+        console.log("rd="+ratiodenominator)
     }
-    function get_previous_tuning(note)
+    /*function get_previous_tuning(note)
     {
         prevcents = note.tuning
-    }
+    }*/
     function logbase2 (base, number1)
     {
         return Math.log(number1)/Math.log(base)
@@ -97,37 +122,52 @@ MuseScore {
 
     function apply_to_nextnote(note)
     {
-        var ratio = rationumerator/ratiodenominator
-        var inicents = 1200 * logbase2(ratio)
+        var ratio1 = (rationumerator/ratiodenominator)
+        console.log("ratio=" +ratio1)
+
+        var inicents = 1200 * logbase2(2,ratio1)
         var abscents = Math.abs (inicents)
-        var underhun = abscents%100
-        if (inicents>=0)
+        console.log("abscents=" +abscents)
+        var underhun = (abscents%100).toFixed(2)
+        console.log("underhun="+underhun)
+        if (dir = 1)
         {
             if (underhun<=50)
                 note.tuning = underhun+prevcents
             else
-                note.tuning = 100-underhun +prevcents
+                note.tuning = -(100-underhun)+prevcents
 
         }
         else
         {
-            if (underhun<50)
+            if (underhun<=50)
                 note.tuning = prevcents - underhun
             else
-                note.tuning = prevcents - (100-underhun)
+                note.tuning = prevcents + (100-underhun)
         }
 
     }
     function ratio_to_cents()
     {
-        applyToNotesInSelection(get_previous_tuning,apply_to_nextnote)
+        console.log("I've reached here")
+
+        applyToNotesInSelection(apply_to_nextnote)
         Qt.quit()
 
+    }
+    function func_tuneup()
+    {
+        dir = 1
+    }
+    function func_tunedown()
+    {
+        dir = 0
     }
     MessageDialog {
     id: errorDialog
     title: "Error"
-    text: ""
+    text: "No note Selected"
+
     onAccepted: {
         errorDialog.close()
     }
@@ -140,10 +180,11 @@ MuseScore {
         color: "lightgrey"
         anchors.fill:parent
         GridLayout {
-            columns: 4
+            columns: 2
+
 
             anchors.fill: parent
-            anchors.margins: 30
+            anchors.margins: 20
             GroupBox{
                 title: "Enter Nnumerator"
                 RowLayout {
@@ -180,6 +221,25 @@ MuseScore {
                 }
             }
             GroupBox{
+                title: "Enter Previous Note Tuning(Press enter upon Entering)"
+                RowLayout {
+                    TextField
+                    {
+                        Layout.maximumWidth: offsetTextWidth
+                        id: previouscents
+                        text: "0.00"
+                        readOnly: false
+                        validator: DoubleValidator { bottom: 0; decimals: 2; notation: DoubleValidator.StandardNotation; top:99 }
+                        property var previousText: "0.00"
+                        property var name: "prev"
+                        onEditingFinished: {
+                            parsedenom()
+
+                        }
+                    }
+                }
+            }
+            GroupBox{
                 title: "Apply Changes"
                 RowLayout
                 {
@@ -202,8 +262,42 @@ MuseScore {
                 }
 
             }
+            GroupBox{
+                title: "Up/ Down Tuning"
+
+                GridLayout
+                {
+                    columns: 2
+                    anchors.margins: 10
+                    ExclusiveGroup { id: updown}
+                    RadioButton
+                    {
+                        text: "Tune up"
+                        checked: true
+                        id: tuneup
+                        exclusiveGroup: updown
+                        onClicked: { func_tuneup() }
+                    }
+                    RadioButton
+                    {
+                        text: "Tune Down"
+
+                        id: tunedown
+                        exclusiveGroup: updown
+                        onClicked: { func_tunedown() }
+                    }
+
+
+                }
+            }
+
+
 
         }
+
+
+
+
 
     }
 }
