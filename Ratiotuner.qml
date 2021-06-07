@@ -132,12 +132,8 @@ MuseScore {
             givenchoice = 1
 
     }
-    function get_previous_tuning()
-    {
-        prevcents = parseFloat(previouscentstxt.text)
-        console.log("pc="+prevcents)
-        prevtuning_entered = 1
-    }
+
+
     function parsenumer()
     {
         if (givenchoice ===1)
@@ -147,7 +143,7 @@ MuseScore {
 
 
     }
-    function applyToNotesInSelection(func)
+    function applyToNotesInSelection(func1,func2)
     {
         var fullScore = !curScore.selection.elements.length
         if (fullScore)
@@ -155,13 +151,88 @@ MuseScore {
             cmd("select-all")
             curScore.startCmd()
         }
-        for (var i in curScore.selection.elements)
-                if (curScore.selection.elements[i].pitch)
-                func(curScore.selection.elements[i])
+        //var lownote = curScore.selection.elements[0].pitch
+
+        //console.log("pitch1="+lownote)
+        //var highnote = curScore.selection.elements[1].pitch
+        //console.log("pitch1="+highnote)
+        var j =0
+        for(var i in curScore.selection.elements)
+        {
+            j+=1
+            if (curScore.selection.elements[i].pitch===0||j >0)
+            {
+                error()
+                Qt.quit()
+
+            }
+        }
+        var firstnotepitch =curScore.selection.elements[0].pitch
+        var secondnotepitch = curScore.selection.elements[1].pitch
+        if (dir ===1)
+        {
+            if (firstnotepitch<secondnotepitch)
+            {
+                func2(curScore.selection.elements[0])
+
+                func1(curScore.selection.elements[1])
+
+            }
+            else
+            {
+                func2(curScore.selection.elements[1])
+                func1(curScore.selection.elements[0])
+
+
+            }
+        }
+
+        else
+        {
+            if (firstnotepitch<secondnotepitch)
+            {
+                func2(curScore.selection.elements[1])
+                func1(curScore.selection.elements[0])
+
+            }
+            else
+            {
+                func2(curScore.selection.elements[0])
+                func1(curScore.selection.elements[1])
+
+            }
+
+        }
+        /*for (var i =0; i<2; i++)
+        {
+            if (curScore.selection.elements[i].pitch)
+            {
+                if (curScore.selection.elements[i+1].pitch<lownote)
+                {
+                    func2(curScore.selection.elements[i+1])
+                    func1(curScore.selection.elements[i])
+                }
+                else
+                {
+                    func2(curScore.selection.elements[i])
+                    func1(curScore.selection.elements[i+1])
+                }
+            }
+        }*/
         if (fullScore) {
             curScore.endCmd()
             cmd("escape")
         }
+    }
+
+    function get_previous_tuning(note1)
+    {
+        /*prevcents = parseFloat(previouscentstxt.text)
+        console.log("pc="+prevcents)
+        prevtuning_entered = 1*/
+        prevcents = note1.tuning
+        console.log("afterget="+prevcents)
+
     }
     function parsedenom()
     {
@@ -213,6 +284,7 @@ MuseScore {
             if (underhun<=50)
                 note.tuning = prevcents-underhun
             else
+
                 note.tuning = prevcents+(100-underhun)
         }
 
@@ -222,12 +294,12 @@ MuseScore {
     function ratio_to_cents()
     {
 
-        prevcents = parseFloat(previouscentstxt.text)
+        /*prevcents = parseFloat(previouscentstxt.text)
         if (prevtuning_entered===0 &&prevcents===0)
             prevcents = 0.00
         else
             prevcents = parseFloat(previouscentstxt.text)
-
+        */
 
 
         console.log("I've reached here 3")
@@ -235,13 +307,13 @@ MuseScore {
 
         if (givenchoice ===1)
         {
-            applyToNotesInSelection(apply_to_nextnote)
+            applyToNotesInSelection(apply_to_nextnote,get_previous_tuning)
         }
         else
         {
             rationumerator = parseFloat(rationum.text)
             ratiodenominator = parseFloat(ratiodenom.text)
-            applyToNotesInSelection(apply_to_nextnote)
+            applyToNotesInSelection(apply_to_nextnote, get_previous_tuning)
         }
 
 
@@ -261,21 +333,24 @@ MuseScore {
         dir = 0
     }
     MessageDialog {
-    id: errorDialog
-    title: "Error"
-    text: ""
+        id: errorDialog
+        title: "Error"
+        text: ""
 
-    onAccepted: {
-        errorDialog.close()
+        onAccepted:
+        {
+            errorDialog.close()
+        }
     }
-    function error(errorMessage) {
-        errorDialog.text = qsTr(errorMessage)
+    function error()
+    {
+        errorDialog.text = qsTr("Please Select 2 notes only")
         errorDialog.open()
     }
 
 
 
-    }
+
     Rectangle
     {
         color: "lightgrey"
@@ -439,7 +514,7 @@ MuseScore {
                     }
 
                 }
-                GroupBox
+                /*GroupBox
                 {
                     title: "Enter Previous Note Tuning (in cents)"
                     RowLayout
@@ -462,7 +537,7 @@ MuseScore {
                     }
 
 
-                }
+                }*/
             GroupBox
             {
                 title: "Up/ Down Tuning"
