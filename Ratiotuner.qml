@@ -14,7 +14,7 @@ MuseScore {
     description: "Description goes here"
     version: "1.0"
     pluginType: "dialog"
-    width: 700
+    width: 400
     height: 400
     property var offsetTextWidth: 40;
     property var offsetLabelAlignment: 0x02 | 0x80;
@@ -25,6 +25,7 @@ MuseScore {
     property var prevcents
     property var dir: 1
     property var givenchoice: 0
+    property var prevtuning_entered: 0
 
     property var unison:
     {
@@ -129,11 +130,14 @@ MuseScore {
     }
     function get_previous_tuning()
     {
-        prevcents = parseFloat(previouscents.text)
+        prevcents = parseFloat(previouscentstxt.text)
         console.log("pc="+prevcents)
+        prevtuning_entered = 1
     }
     function parsenumer()
     {
+        if (givenchoice ===1)
+            return;
         rationumerator = parseFloat(rationum.text)
         console.log("rn="+rationumerator)
 
@@ -157,6 +161,8 @@ MuseScore {
     }
     function parsedenom()
     {
+        if (givenchoice ===1)
+            return;
         ratiodenominator = parseFloat(ratiodenom.text)
         console.log("rd="+ratiodenominator)
     }
@@ -173,7 +179,7 @@ MuseScore {
     {
         var prvc = prevcents
         var ratio1 = (rationumerator/ratiodenominator)
-        console.log("pc="+prvc)
+
 
         console.log("ratio=" +ratio1)
 
@@ -210,6 +216,13 @@ MuseScore {
 
     function ratio_to_cents()
     {
+
+        prevcents = parseFloat(previouscentstxt.text)
+        if (prevtuning_entered===0 &&prevcents===0)
+            prevcents = 0.00
+        else
+            prevcents = parseFloat(previouscentstxt.text)
+
         console.log("I've reached here 3")
         console.log("pc="+prevcents)
 
@@ -427,7 +440,7 @@ MuseScore {
                         TextField
                         {
                             Layout.maximumWidth: offsetTextWidth
-                            id: previouscents
+                            id: previouscentstxt
                             text: "0.00"
                             readOnly: false
                             validator: DoubleValidator { bottom: -99.99; decimals: 2; notation: DoubleValidator.StandardNotation; top:99.99 }
