@@ -117,7 +117,7 @@ MuseScore {
         if (typeof curScore  === 'undefined')
         {
             Qt.quit()
-            
+
         }
     }
     function assignratioclick(ratio)
@@ -161,7 +161,7 @@ MuseScore {
         for(var i in curScore.selection.elements)
         {
             j+=1
-            if (curScore.selection.elements[i].pitch===0)
+            if (curScore.selection.elements[i].pitch===undefined)
             {
                 error()
                 Qt.quit()
