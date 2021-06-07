@@ -210,7 +210,7 @@ MuseScore {
 
     function ratio_to_cents()
     {
-        console.log("I've reached here")
+        console.log("I've reached here 3")
         console.log("pc="+prevcents)
 
         if (givenchoice ===1)
@@ -227,7 +227,7 @@ MuseScore {
 
 
 
-        applyToNotesInSelection(apply_to_nextnote)
+
         Qt.quit()
 
     }
@@ -310,7 +310,7 @@ MuseScore {
                         id: perfectfourth_button
                         text: "Perfect Fourth (4/3)"
                         exclusiveGroup: availableratios
-                        onClicked: { assignratioclick(perfectfourthw)}
+                        onClicked: { assignratioclick(perfectfourth)}
 
                     }
                     RadioButton{
@@ -503,5 +503,5 @@ MuseScore {
 
     }
 
-    
+
 }
