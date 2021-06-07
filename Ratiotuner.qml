@@ -192,7 +192,7 @@ MuseScore {
                         id: previouscents
                         text: "0.00"
                         readOnly: false
-                        validator: DoubleValidator { bottom: 0; decimals: 2; notation: DoubleValidator.StandardNotation; top:99 }
+                        validator: DoubleValidator { bottom: -99.99; decimals: 2; notation: DoubleValidator.StandardNotation; top:99.99 }
                         property var previousText: "0.00"
                         property var name: "prev"
                         onEditingFinished: {
