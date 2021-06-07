@@ -211,9 +211,9 @@ MuseScore {
         else
         {
             if (underhun<=50)
-                note.tuning = prvc-underhun
+                note.tuning = prevcents-underhun
             else
-                note.tuning = prvc+(100-underhun)
+                note.tuning = prevcents+(100-underhun)
         }
 
     }
