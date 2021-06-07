@@ -117,6 +117,7 @@ MuseScore {
         if (typeof curScore  === 'undefined')
         {
             Qt.quit()
+            
         }
     }
     function assignratioclick(ratio)
@@ -160,13 +161,19 @@ MuseScore {
         for(var i in curScore.selection.elements)
         {
             j+=1
-            if (curScore.selection.elements[i].pitch===0||j >0)
+            if (curScore.selection.elements[i].pitch===0)
             {
                 error()
                 Qt.quit()
 
             }
         }
+        if (j!=2)
+        {
+            error()
+            Qt.quit()
+        }
+
         var firstnotepitch =curScore.selection.elements[0].pitch
         var secondnotepitch = curScore.selection.elements[1].pitch
         if (dir ===1)
@@ -344,7 +351,7 @@ MuseScore {
     }
     function error()
     {
-        errorDialog.text = qsTr("Please Select 2 notes only")
+        errorDialog.text = qsTr("Please Select 2 notes only and try (quit)")
         errorDialog.open()
     }
 
