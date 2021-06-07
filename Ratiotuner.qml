@@ -181,38 +181,39 @@ MuseScore {
 
     function apply_to_nextnote(note)
     {
-        var prvc = prevcents
+
         var ratio1 = (rationumerator/ratiodenominator)
 
 
         console.log("ratio=" +ratio1)
+        console.log("prevcents1="+prevcents)
 
         var inicents = 1200 * logbase2(2,ratio1)
         var abscents = Math.abs (inicents)
         console.log("abscents=" +abscents)
-        var underhun = (abscents%100).toFixed(2)
+        var underhun = parseFloat((abscents%100).toFixed(2))
         var fin = 0
         console.log("underhun="+underhun)
         if (dir ===  1)
         {
             if (underhun<=50){
                 console.log("underhun="+underhun)
-                fin = underhun + prvc
+                fin = (underhun+prevcents).toFixed(2)
                 console.log("fin="+fin)
 
 
                 note.tuning = fin
             }
             else
-                note.tuning = -(100-underhun)+ prvc
+                note.tuning = (-(100-underhun)+prevcents).toFixed(2)
 
         }
         else
         {
             if (underhun<=50)
-                note.tuning = prvc - underhun
+                note.tuning = prvc-underhun
             else
-                note.tuning = prvc + (100-underhun)
+                note.tuning = prvc+(100-underhun)
         }
 
     }
@@ -226,6 +227,8 @@ MuseScore {
             prevcents = 0.00
         else
             prevcents = parseFloat(previouscentstxt.text)
+
+
 
         console.log("I've reached here 3")
         console.log("pc="+prevcents)
