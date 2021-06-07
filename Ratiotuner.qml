@@ -47,63 +47,18 @@ MuseScore {
 
 
     }
-    function applyToNotesInSelection(func2) {
-        if (typeof curScore === 'undefined')
-            return;
-
-            var cursor     = curScore.newCursor();
-            cursor.rewind(1);
-            var startStaff  = cursor.staffIdx;
-            cursor.rewind(2);
-            var endStaff   = cursor.staffIdx;
-            var endTick    = cursor.tick // if no selection, end of score
-            var fullScore = false;
-            if (!cursor.segment) { // no selection
-                  fullScore = true;
-                  startStaff = 0; // start with 1st staff
-                  endStaff = curScore.nstaves; // and end with last
+     function applyToNotesInSelection(func) {
+            var fullScore = !curScore.selection.elements.length
+            if (fullScore) {
+                  cmd("select-all")
+                  curScore.startCmd()
             }
-            console.log(startStaff + " - " + endStaff + " - " + endTick)
-            for (var staff = startStaff; staff <= endStaff; staff++) {
-                  for (var voice = 0; voice < 4; voice++) {
-                        cursor.rewind(1); // sets voice to 0
-                        cursor.voice = voice; //voice has to be set after goTo
-                        cursor.staffIdx = staff;
-
-                        if (!cursor.segment)
-                              cursor.rewind(0) // if no selection, beginning of score
-
-                        while (cursor.segment && (fullScore || cursor.tick < endTick)) {
-                              if (cursor.element && cursor.element.type == Element.CHORD) {
-                                    var notes = cursor.element.notes;
-
-                                    /*for (var i = 0; i< notes.length;i++)
-                                    {
-                                        for (var j =i+1;j<notes.length;j++)
-                                        {
-
-                                                if (notes[i].pitch>notes[j].pitch)
-                                                {
-                                                    var temp = notes[i];
-                                                    notes[i]= arr[j];
-                                                    notes[j] = temp;
-                                                }
-                                        }
-                                    }*/
-                                    console.log("I've reached here 2")
-
-                                    for (var i = 0; i < notes.length; i++) {
-                                          var note = notes[i];
-                                          if (i===0)
-                                            func2(note);
-                                        else
-                                            Qt.quit()
-
-                                    }
-                              }
-                              cursor.next();
-                        }
-                  }
+            for (var i in curScore.selection.elements)
+                  if (curScore.selection.elements[i].pitch)
+                        func(curScore.selection.elements[i])
+            if (fullScore) {
+                  curScore.endCmd()
+                  cmd("escape")
             }
       }
     function parsedenom()
@@ -156,7 +111,7 @@ MuseScore {
     function ratio_to_cents()
     {
         console.log("I've reached here")
-        
+
         prevcents = parseFloat(previouscents.text)
 
         applyToNotesInSelection(apply_to_nextnote)
