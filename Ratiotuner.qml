@@ -126,7 +126,11 @@ MuseScore {
 
         ratiodenominator = ratio.den
         console.log("ratdenom="+ratiodenominator)
-        givenchoice = 1
+        if (ratio.name === "customratio")
+            givenchoice =0
+        else
+            givenchoice = 1
+
     }
     function get_previous_tuning()
     {
